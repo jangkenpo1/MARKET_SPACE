@@ -20,7 +20,7 @@ struct seller{
     string password;
     string namaToko;
     struct attributinformasiToko{
-        int LuasTanahRuko;
+        int luasTanah;
         int luasRuangan;
         int hargaSewa;
         int JlmhLantai;
