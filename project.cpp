@@ -75,7 +75,7 @@ void SignIn(int jenis){//1 member, 2 seller, 3 mitra
 	cin.ignore();
 	string username, password;
 	bool valid = false;
-	switch(jenis){//1 member, 2 seller, 3 mitra
+	switch(jenis){
 		case 1:
 			do {
 				Banner();
@@ -93,8 +93,8 @@ void SignIn(int jenis){//1 member, 2 seller, 3 mitra
 			            usernameDitemukan = true;
 			            if (AkunMember[i].data.password == password) {
 			                loginBerhasil = true;
-			                break;  // username & password cocok, keluar loop
-			            } break; // username cocok, tapi password salah — tidak perlu lanjut
+			                break;  
+			            } break; 
 			        }
 			    }
 			    if (loginBerhasil) {
@@ -133,8 +133,8 @@ void SignIn(int jenis){//1 member, 2 seller, 3 mitra
 			            usernameDitemukan = true;
 			            if (AkunSeller[i].data.password == password) {
 			                loginBerhasil = true;
-			                break;  // username & password cocok, keluar loop
-			            } break; // username cocok, tapi password salah — tidak perlu lanjut
+			                break;  
+			            } break; 
 			        }
 			    }
 			    if (loginBerhasil) {
@@ -173,8 +173,8 @@ void SignIn(int jenis){//1 member, 2 seller, 3 mitra
 			            usernameDitemukan = true;
 			            if (AkunMitra[i].data.password == password) {
 			                loginBerhasil = true;
-			                break;  // username & password cocok, keluar loop
-			            } break; // username cocok, tapi password salah — tidak perlu lanjut
+			                break;  
+			            } break; 
 			        }
 			    }
 			    if (loginBerhasil) {
