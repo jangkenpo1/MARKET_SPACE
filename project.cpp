@@ -109,7 +109,7 @@ void SignIn(int jenis){//1 member, 2 seller, 3 mitra
 			    cout << "Ingin coba lagi? (y/n): ";
 		        char jawab;
 		        cin >> jawab;
-		        cin.ignore(); // buang enter
+		        cin.ignore();
 		        if (jawab == 'y' || jawab == 'Y') valid = false;
 		        else {
 		        	system("pause");
