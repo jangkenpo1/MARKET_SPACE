@@ -70,6 +70,14 @@ struct Seller {
 }AkunSeller[100];
 int jumlahSeller = 0;
 
+struct Promo {
+    string namaBarang;
+    int potongan; // dalam persen
+    bool aktif;
+};
+Promo daftarPromo[100];
+int jumlahPromo = 0;
+
 // Cetak banner
 void Banner() {
 	system("cls");
@@ -121,20 +129,20 @@ void MenuSeller(int idxAkunLogin){
         CetakMid("Profil Toko", true, 70, 2);
         CetakMid("Kelola Barang", true, 70, 3);
         CetakMid("Riwayat Penjualan", true, 70, 4);
-        CetakMid("Pesanan Masuk", true, 70, 5);
-        CetakMid("Kelola Promo", true, 70, 6);
-        CetakMid("Back", true, 70, 7);
+        CetakMid("Kelola Promo", true, 70, 5);
+        CetakMid("Back", true, 70, 6);
         for(int i = 0; i < 72; i++) cout << "=";
         input = getch();
         switch (input) {
-            case 72: pilih = (pilih == 1) ? 7 : pilih - 1; break;
-            case 80: pilih = (pilih == 7) ? 1 : pilih + 1; break;
+            case 72: pilih = (pilih == 1) ? 6 : pilih - 1; break;
+            case 80: pilih = (pilih == 6) ? 1 : pilih + 1; break;
             case 13:{
             	switch(pilih){
             		case 1:
             			system ("pause"); //nanti kerjain kalo sudah fix yang meusewa
             			break;
             		case 2:
+            			system ("cls"); Banner();
             			CetakMid("PROFIL TOKO", true, 70);
             			for(int i = 0; i < 72; i++) cout << "="; cout << endl;
             			if (toko.namaToko == "") {
@@ -184,10 +192,10 @@ void MenuSeller(int idxAkunLogin){
 						system ("pause");
                         break;
             		case 3:{
-            			cin.ignore();
-            			int choose = 1;
+            			pilih = 1;
+            			int ulang = 0;
 					    do {
-					    	system ("cls"); Banner();
+					        system ("cls"); Banner();
 					        CetakMid("KELOLA BARANG", true, 70);
 					        for(int i = 0; i < 72; i++) cout << "="; cout << endl;
 							CetakMid("Lihat Daftar Barang", true, 70, 1);
@@ -196,20 +204,20 @@ void MenuSeller(int idxAkunLogin){
 					        CetakMid("Hapus Barang", true, 70, 4);
 					        CetakMid("Back", true, 70, 5);
 					        for(int i = 0; i < 72; i++) cout << "=";
+					
 					        input = getch();
-							if (input == 0 || input == -32) {
-						        input = getch();
-						        if (input == 72) choose = (choose == 1) ? 5 : choose - 1;
-						        else if (input == 80) choose = (choose == 5) ? 1 : choose + 1;
-						    } else if (input == 13){
-							        switch(choose){
-							        	case 1:{
-											system ("cls"); Banner();
+					        switch (input) {
+					            case 72: pilih = (pilih == 1) ? 5 : pilih - 1; break;
+					            case 80: pilih = (pilih == 5) ? 1 : pilih + 1; break;
+					            case 13:
+					            	switch(pilih){
+					            		case 1:{
+					            			system ("cls"); Banner();
 									        CetakMid("Lihat Daftar Barang", true, 70);
 									        for(int i = 0; i < 72; i++) cout << "="; cout << endl;
 							            	if (toko.jumlahBarang == 0) {
 										        cout << "Belum ada barang di toko.\n";
-										        continue;
+										        system ("pause"); continue;
 										    }
 										    for (int i = 0; i < toko.jumlahBarang - 1; i++) {
 										        for (int j = i + 1; j < toko.jumlahBarang; j++) {
@@ -224,16 +232,19 @@ void MenuSeller(int idxAkunLogin){
 										    for (int i = 0; i < toko.jumlahBarang; i++) {
 										        if (toko.daftarBarang[i].kategori != currentKategori) {
 										            currentKategori = toko.daftarBarang[i].kategori;
-										            cout << "\n============================== " << currentKategori << " ==============================\n";
+										            cout << "\n================================= " << currentKategori << " =================================\n";
 										        }
-										        cout << " | Nama Barang : " << toko.daftarBarang[i].nama
-										             << " | Harga       : " << toko.daftarBarang[i].harga
-										             << " | Stok        : " << toko.daftarBarang[i].stok
+										        cout << " | Nama Barang : " << toko.daftarBarang[i].nama << "\n"
+										             << " | Harga       : Rp." << toko.daftarBarang[i].harga << "\n"
+										             << " | Stok        : " << toko.daftarBarang[i].stok << "\n"
 										             << " | Deskripsi   : " << toko.daftarBarang[i].deskripsi << "\n";
-										    } break;
-										} 
-							            case 2: {
-							            	system ("cls"); Banner();
+										        cout << "---------------------------------------------------------------------------------------------------------\n";
+										    } system("pause");
+											break;
+										}
+					            		case 2:{
+					            			cin.ignore();
+					            			system ("cls"); Banner();
 									        CetakMid("Tambah Barang", true, 70);
 									        for(int i = 0; i < 72; i++) cout << "="; cout << endl;
 							            	if (toko.jumlahBarang >= toko.kapasitasBarang) {
@@ -247,7 +258,7 @@ void MenuSeller(int idxAkunLogin){
 										        toko.kapasitasBarang = kapasitasBaru;
 										    }
 										    Barang baru;
-										    cout << "Nama barang: "; cin.ignore(); getline(cin, baru.nama);
+										    cout << "Nama barang: "; getline(cin, baru.nama);
 										    cout << "Kategori: "; getline(cin, baru.kategori);
 										    cout << "Deskripsi: "; getline(cin, baru.deskripsi);
 										    cout << "Harga: "; cin >> baru.harga;
@@ -255,12 +266,17 @@ void MenuSeller(int idxAkunLogin){
 										
 										    toko.daftarBarang[toko.jumlahBarang++] = baru;
 										    cout << "Barang berhasil ditambahkan.\n";
+										    system("pause");
 											break;
 										}
-							            case 3: {
-							            	system ("cls"); Banner();
+					            		case 3:{
+					            			system ("cls"); Banner();
 									        CetakMid("Edit Barang", true, 70);
 									        for(int i = 0; i < 72; i++) cout << "="; cout << endl;
+									        if (toko.jumlahBarang == 0) {
+										        cout << "Tidak ada barang untuk di edit.\n";
+										        system ("pause"); continue;
+										    }
 											if (toko.jumlahBarang == 0) {
 										        cout << "Tidak ada barang untuk diedit.\n";
 										        continue;
@@ -290,15 +306,16 @@ void MenuSeller(int idxAkunLogin){
 										    cin >> toko.daftarBarang[idx].stok;
 										
 										    cout << "Barang berhasil diedit.\n";
+										    system("pause");
 											break;
 										}
-							            case 4: {
-							            	system ("cls"); Banner();
+										case 4:{
+											system ("cls"); Banner();
 									        CetakMid("Hapus Barang", true, 70);
 									        for(int i = 0; i < 72; i++) cout << "="; cout << endl;
 							            	if (toko.jumlahBarang == 0) {
 										        cout << "Tidak ada barang untuk dihapus.\n";
-										        continue;
+										        system ("pause"); continue;
 										    }
 										
 										    for (int i = 0; i < toko.jumlahBarang; i++) {
@@ -317,19 +334,21 @@ void MenuSeller(int idxAkunLogin){
 										    }
 										    toko.jumlahBarang--;
 										    cout << "Barang berhasil dihapus.\n";
+										    system("pause");
 											break;
 										}
-							            case 5: choose = 0; cin.ignore(); break;
-							        }
-							}
-						} while (choose != 0);
-	            		break;
+					            		case 5:
+					            			ulang = 1; break;
+									} 
+					        } if (ulang == 1) break; 
+					    } while (true);
+					    break;
 					}	
             		case 4: {
             			system ("cls"); Banner();
 					    CetakMid("RIWAYAT PENJUALAN", true, 70);
 					    for(int i = 0; i < 72; i++) cout << "="; cout << endl;
-            			string tokoSaya = AkunSeller[idxAkunLogin].data.namaToko;
+            			string tokoSaya = AkunSeller[idxAkunLogin].toko.namaToko;
 					    bool ada = false;
 					    for (int i = 0; i < jumlahMember; i++) {
 					        for (int j = 0; j < AkunMember[i].indeksBarangMember; j++) {
@@ -348,25 +367,129 @@ void MenuSeller(int idxAkunLogin){
 						break;
 					}
             		case 5: {
-
-            			system ("cls"); Banner();
-					    CetakMid("PESANAN MASUK", true, 70);
-					    for(int i = 0; i < 72; i++) cout << "="; cout << endl;
-					    
-            			break;
+            			pilih = 1;
+            			int ulang = 0;
+					    do {
+					        system("cls");
+					        Banner();
+					        CetakMid("KELOLA PROMO", true, 70);
+					        for (int i = 0; i < 72; i++) cout << "="; cout << endl;
+							CetakMid("Lihat Promo", true, 70, 1);
+							CetakMid("Tambah Promo", true, 70, 2);
+							CetakMid("Hapus Promo", true, 70, 3);
+							CetakMid("Back", true, 70, 4);
+					        for (int i = 0; i < 72; i++) cout << "="; cout << endl;
+					
+					        input = getch();
+					        switch (input) {
+					            case 72: pilih = (pilih == 1) ? 4 : pilih - 1; break;
+					            case 80: pilih = (pilih == 4) ? 1 : pilih + 1; break;
+					            case 13:
+					            	switch(pilih){
+					            		case 1:{
+					            			system("cls");
+							                Banner();
+							                CetakMid("PROMO SAYA", true, 70);
+							                for (int i = 0; i < 72; i++) cout << "="; cout << endl;
+							
+							                bool ada = false;
+							                for (int i = 0; i < jumlahPromo; i++) {
+							                    if (daftarPromo[i].aktif) {
+							                        for (int j = 0; j < AkunSeller[idxAkunLogin].toko.jumlahBarang; j++) {
+							                            if (daftarPromo[i].namaBarang == AkunSeller[idxAkunLogin].toko.daftarBarang[j].nama) {
+							                                cout << "- " << daftarPromo[i].namaBarang
+							                                     << " | Potongan: " << daftarPromo[i].potongan << "%\n";
+							                                ada = true;
+							                            }
+							                        }
+							                    }
+							                }
+							                if (!ada) cout << "Tidak ada promo aktif.\n";
+							                system("pause");
+											break;
+										}
+					            		case 2:{
+					            			string namaBarang;
+							                int potongan;
+							                bool ditemukan = false;
+							                system("cls");
+							                Banner();
+							                CetakMid("TAMBAH PROMO", true, 70);
+							                for (int i = 0; i < 72; i++) cout << "="; cout << endl;
+							                cout << "Masukkan nama barang Anda: ";
+							                getline(cin, namaBarang);
+							                cout << "Potongan (%): ";
+							                cin >> potongan;
+							
+							                for (int i = 0; i < AkunSeller[idxAkunLogin].toko.jumlahBarang; i++) {
+							                    if (AkunSeller[idxAkunLogin].toko.daftarBarang[i].nama == namaBarang) {
+							                        // Cek apakah promo sudah ada
+							                        bool duplikat = false;
+							                        for (int j = 0; j < jumlahPromo; j++) {
+							                            if (daftarPromo[j].namaBarang == namaBarang && daftarPromo[j].aktif) {
+							                                cout << "Promo sudah ada untuk barang tersebut.\n";
+							                                duplikat = true;
+							                                break;
+							                            }
+							                        }
+							                        if (duplikat) break;
+							
+							                        daftarPromo[jumlahPromo].namaBarang = namaBarang;
+							                        daftarPromo[jumlahPromo].potongan = potongan;
+							                        daftarPromo[jumlahPromo].aktif = true;
+							                        jumlahPromo++;
+							
+							                        cout << "Promo berhasil ditambahkan!\n";
+							                        ditemukan = true;
+							                        break;
+							                    }
+							                }
+							                if (!ditemukan) {
+							                    cout << "Barang tidak ditemukan di toko Anda.\n";
+							                }
+							                system("pause");
+											break;
+										}
+					            		case 3:{
+					            			string namaBarang;
+							                bool ditemukan = false;
+							
+							                system("cls");
+							                Banner();
+							                CetakMid("HAPUS PROMO", true, 70);
+							                for (int i = 0; i < 72; i++) cout << "="; cout << endl;
+							
+							                cin.ignore();
+							                cout << "Masukkan nama barang yang ingin dihapus promonya: ";
+							                getline(cin, namaBarang);
+							
+							                for (int i = 0; i < jumlahPromo; i++) {
+							                    if (daftarPromo[i].namaBarang == namaBarang && daftarPromo[i].aktif) {
+							                        for (int j = 0; j < AkunSeller[idxAkunLogin].toko.jumlahBarang; j++) {
+							                            if (AkunSeller[idxAkunLogin].toko.daftarBarang[j].nama == namaBarang) {
+							                                daftarPromo[i].aktif = false;
+							                                cout << "Promo berhasil dihapus.\n";
+							                                ditemukan = true;
+							                                break;
+							                            }
+							                        }
+							                    }
+							                    if (ditemukan) break;
+							                }
+							                if (!ditemukan) cout << "Promo tidak ditemukan atau bukan barang Anda.\n";
+							                system("pause");
+											break;
+										}
+					            		case 4:
+					            			ulang = 1; break;
+									} 
+					        } if (ulang == 1) break;
+					    } while (true);
+					    break;
 					}
-            		case 6: {
-
-            			system ("cls"); Banner();
-					    CetakMid("KELOLA PROMO", true, 70);
-					    for(int i = 0; i < 72; i++) cout << "="; cout << endl;
-            			
+            		case 6:
             			break;
-					}
-            		case 7:
-            			return;
 				}
-				break;
 			}
         }
     } while (true);
