@@ -9,6 +9,26 @@ struct DataDiri {
     int saldo = 0;
 };
 
+struct Alamat {
+	string jalan, provinsi, kota, kabupaten;
+	int nomor;
+};
+
+struct mitra {
+	string namaToko;
+	string noTelp;
+	float luasTanah, luasRuangan;
+    int hargaSewa, jumlahLantai;
+	Alamat alamatToko;
+} ;
+
+struct Mitra {
+	DataDiri data;
+	mitra TokoMitra[100];
+	int indeksTokoMitra;
+} AkunMitra[100];
+int jumlahMitra = 0;
+
 struct Seller {
     DataDiri data;
     string namaToko;
@@ -41,13 +61,9 @@ struct Member {
     DataDiri data;
     string HP, email;
     member BarangMember[100];
+	int indeksBarangMember = 0;
 }AkunMember[100];
 int jumlahMember = 0;
-
-struct Mitra {
-    DataDiri data;
-}AkunMitra[100];
-int jumlahMitra = 0;
 
 void MenuSign(bool signin);
 
@@ -92,9 +108,12 @@ void CetakMid(string teks, bool enter = false, int lebar = 70, int menuPil = 0) 
 void MenuMember(){
     cin.ignore();
     do{
+	string Baru;
+	string PreviewNamaBarang[100];
+	int PreviewHargaBarang[100];
     system("cls");
     Banner();
-    CetakMid("MENU MEMBER", true, 70);
+    CetakMid("Halo " + AkunMember[AkunYangMasuk].data.nama, true, 70);
     for(int i = 0; i < 72; i++) cout << "="; cout << endl;
     CetakMid("Beli Barang", true, 70, 1);
     CetakMid("Saldo", true, 70, 2);
@@ -119,25 +138,88 @@ void MenuMember(){
                         if (jumlahBarang == 0) {
                             cout << "Tidak ada barang tersedia." << endl;
                         } else {
-                        for(int i = 0; i < jumlahBarang; i++) {  
-                            cout << i + 1 << ". " << BarangSeller[i].namaBarang 
-                            << " - Rp." << BarangSeller[i].harga 
-                            << " (Stok: " << BarangSeller[i].stok << ")" << endl;
-                            }
+							int beliBarang = 0;
+							int harga = 0;
+							do {
+								for(int i = 0; i < jumlahBarang; i++) {
+									CetakMid(BarangSeller[i].namaBarang, true, 33, i + 1);
+									if (i % 3 == 0) cout << endl;
+								}
+								for(int i = 0; i < 72; i++) cout << "="; cout << endl;
+								CetakMid( "Daftar Keranjang :", true, 3);
+								for (int j = 0; j < beliBarang; j++) {
+									cout << j + 1 << ". " << PreviewNamaBarang[j] 
+										  << " - Rp." << PreviewHargaBarang[j] << endl;
+								}
+								for(int i = 0; i < 72; i++) cout << "="; cout << endl;
+								CetakMid( "BAYAR", true, 3, jumlahBarang );
+								for(int i = 0; i < 72; i++) cout << "="; cout << endl;
+								CetakMid( "CANCEL", true, 3, jumlahBarang + 1);
+								for(int i = 0; i < 72; i++) cout << "="; cout << endl;
+								case 72: pilih = (pilih == 1) ? jumlahBarang : pilih - 1; break; // Up
+            					case 80: pilih = (pilih == jumlahBarang + 1) ? 1 : pilih + 1; break; // Down
+								case 13:
+									if(pilih < jumlahBarang){
+										system("cls");
+										Banner();
+										CetakMid("PREVIEW", true, 70);
+										for(int i = 0; i < 72; i++) cout << "="; cout << endl;
+										if (BarangSeller[pilih - 1].stok == 0) {
+											cout << "Stok barang habis." << endl;
+										} else {
+											cout << "Nama Barang: " << BarangSeller[pilih - 1].namaBarang << endl;
+											PreviewNamaBarang[beliBarang] = BarangSeller[pilih - 1].namaBarang;
+											cout << "Harga: Rp." << BarangSeller[pilih - 1].harga << endl;
+											PreviewHargaBarang[beliBarang] = BarangSeller[pilih - 1].harga;
+											harga += BarangSeller[pilih - 1].harga;
+											cout << "Stok: " << BarangSeller[pilih - 1].stok << endl;
+											cout << "Deskripsi: " << BarangSeller[pilih - 1].deskripsi << endl;
+											beliBarang++;
+										}
+									}
+									else if (pilih == jumlahBarang) {
+										system("cls");
+										Banner();
+										CetakMid("CHECKOUT", true, 70);
+										for(int i = 0; i < 72; i++) cout << "="; cout << endl;
+										if (beliBarang > 0) {
+											cout << "Total Harga: Rp." << harga << endl;
+											system("pause");
+											if (AkunMember[AkunYangMasuk].data.saldo >= harga) {
+												AkunMember[AkunYangMasuk].data.saldo -= harga;
+												for (int i = 0; i < beliBarang; i++) {
+													AkunMember[AkunYangMasuk].BarangMember[i].jumlah = 1; 
+												}
+												int indeksBarang = AkunMember[AkunYangMasuk].indeksBarangMember ;
+												for (int i = 0; i < beliBarang; i++) {
+													AkunMember[AkunYangMasuk].BarangMember[indeksBarang].namaBarang = PreviewNamaBarang[i];
+													AkunMember[AkunYangMasuk].BarangMember[indeksBarang].harga = PreviewHargaBarang[i];
+													indeksBarang++;
+												}
+												AkunMember[AkunYangMasuk].indeksBarangMember = indeksBarang;
+												cout << "Pembelian berhasil! Saldo Anda sekarang: Rp." << AkunMember[AkunYangMasuk].data.saldo << endl;
+											} else {
+												cout << "Saldo tidak cukup untuk melakukan pembelian." << endl;
+											}
+										} else {
+											system("cls");
+											Banner();
+											CetakMid("KERANJANG", true, 70);
+											for(int i = 0; i < 72; i++) cout << "="; cout << endl;
+											if (beliBarang == 0) {
+												cout << "Keranjang kosong. Tidak ada barang yang dibeli." << endl;
+											}
+										}
+										break;
+									}
+									else if (pilih == jumlahBarang + 1){
+
+									}
+									system("pause");
+							} while (true);
+
                         }
-                        cout << "Masukkan nomor barang yang ingin dibeli (0 untuk batal): ";
-                        int nomorBarang;
-                        cin >> nomorBarang;
-                        system("pause");
-                        if (nomorBarang == 0 && nomorBarang > jumlahBarang) {
-                            break;
-                        } else if (nomorBarang > 0 && nomorBarang <= jumlahBarang) {
-                            AkunMember[AkunYangMasuk].BarangMember[jumlahBarangMember].namaBarang = BarangSeller[nomorBarang - 1].namaBarang;
-                            AkunMember[AkunYangMasuk].BarangMember[jumlahBarangMember].harga = BarangSeller[nomorBarang - 1].harga;
-                            AkunMember[AkunYangMasuk].BarangMember[jumlahBarangMember].jumlah += 1;
-                            jumlahBarangMember++;
-                            cout << "Barang berhasil dibeli!" << endl;
-                        }
+						system("pause");
                         break;
                     }
             		case 2 : {
@@ -183,11 +265,61 @@ void MenuMember(){
                         Banner();
                         CetakMid("PROFILE " + AkunMember[AkunYangMasuk].data.nama, true, 70);
                         for(int i = 0; i < 72; i++) cout << "="; cout << endl;
-                        cout << "Nama: " << AkunMember[AkunYangMasuk].data.nama << endl;
-                        cout << "Username: " << AkunMember[AkunYangMasuk].data.username << endl;
-                        cout << "No HP: " << AkunMember[AkunYangMasuk].HP << endl;
-                        cout << "Email: " << AkunMember[AkunYangMasuk].email << endl;
-                        cout << "Saldo: " << AkunMember[AkunYangMasuk].data.saldo << endl;
+                        cout << "1. Nama: " << AkunMember[AkunYangMasuk].data.nama << endl;
+                        cout << "2. Username: " << AkunMember[AkunYangMasuk].data.username << endl;
+                        cout << "3. No HP: " << AkunMember[AkunYangMasuk].HP << endl;
+                        cout << "4. Email: " << AkunMember[AkunYangMasuk].email << endl;
+						cout << "5. Password: " << AkunMember[AkunYangMasuk].data.password << endl;
+                        cout << "6. Saldo: " << AkunMember[AkunYangMasuk].data.saldo << endl;
+						int pilihan;
+						cout << "Ketik 1-5 untuk mengubah data, ketik 0 untuk kembali... "; cin >> pilihan;
+						cin.ignore();
+						if (pilihan == 1) {
+							cout << "Masukkan nama baru: "; getline(cin, Baru);
+							cout << "Apakah anda yakin? (y/n): ";
+							char jawab;		
+							cin >> jawab;
+							if (jawab == 'y' || jawab == 'Y') {
+								AkunMember[AkunYangMasuk].data.nama = Baru;
+								cout << "Data berhasil diubah!\n";
+							}
+						} else if (pilihan == 2) {
+							cout << "Masukkan username baru: "; getline(cin, Baru);
+							cout << "Apakah anda yakin? (y/n): ";
+							char jawab;
+							cin >> jawab;
+							if (jawab == 'y' || jawab == 'Y') {
+								AkunMember[AkunYangMasuk].data.username = Baru;
+								cout << "Data berhasil diubah!\n";
+							}
+						} else if (pilihan == 3) {
+							cout << "Masukkan No HP baru: "; getline(cin, Baru);
+							cout << "Apakah anda yakin? (y/n): ";
+							char jawab;
+							cin >> jawab;
+							if (jawab == 'y' || jawab == 'Y') {
+								AkunMember[AkunYangMasuk].HP = Baru;
+								cout << "Data berhasil diubah!\n";
+							}
+						} else if (pilihan == 4) {
+							cout << "Masukkan Email baru: "; getline(cin, Baru);
+							cout << "Apakah anda yakin? (y/n): ";
+							char jawab;
+							cin >> jawab;
+							if (jawab == 'y' || jawab == 'Y') {
+								AkunMember[AkunYangMasuk].email = Baru;
+								cout << "Data berhasil diubah!\n";
+							}
+						} else if (pilihan == 5) {
+							cout << "Masukkan Password baru: "; getline(cin, Baru);
+							cout << "Apakah anda yakin? (y/n): ";
+							char jawab;
+							cin >> jawab;
+							if (jawab == 'y' || jawab == 'Y') {
+								AkunMember[AkunYangMasuk].data.password = Baru;
+								cout << "Data berhasil diubah!\n";
+							}
+						} 
                         system("pause");
                         break;
             		case 5 : {
@@ -198,6 +330,147 @@ void MenuMember(){
         }
     } while (true);
 }
+
+void MenuMitra(){
+	cin.ignore();
+    do{
+    system("cls");
+    Banner();
+    CetakMid("Halo " + AkunMitra[AkunYangMasuk].data.nama, true, 70);
+    for(int i = 0; i < 72; i++) cout << "="; cout << endl;
+	CetakMid("Tambah Toko", true, 70, 1);
+    CetakMid("Daftar Toko", true, 70, 2);
+    CetakMid("Saldo", true, 70, 3);
+    CetakMid("Profile", true, 70, 4);
+    CetakMid("Log Out", true, 70, 5);
+    for(int i = 0; i < 72; i++) cout << "=";
+
+        input = getch();
+        switch(input) {
+            case 72: pilih = (pilih == 1) ? 5 : pilih - 1; break; // Up
+            case 80: pilih = (pilih == 5) ? 1 : pilih + 1; break; // Down
+            case 13:
+			switch(pilih) {
+				case 1: {
+					system("cls");
+					Banner();
+					int indeksToko = AkunMitra[AkunYangMasuk].indeksTokoMitra;
+					CetakMid("TAMBAH RUKO " + AkunMitra[AkunYangMasuk].data.nama, true, 70);
+					for(int i = 0; i < 72; i++) cout << "="; cout << endl;
+					cout << "Masukkan Nama Toko: ";	cin.ignore(); getline(cin, AkunMitra[AkunYangMasuk].TokoMitra[indeksToko].namaToko);
+					cout << "Masukkan Alamat : ";	cin.ignore();getline(cin, AkunMitra[AkunYangMasuk].TokoMitra[indeksToko].alamatToko.jalan);
+					cout << "Masukkan Kabupaten: ";	cin.ignore(); getline(cin, AkunMitra[AkunYangMasuk].TokoMitra[indeksToko].alamatToko.kabupaten);
+					cout << "Masukkan Kota: ";	cin.ignore(); getline(cin, AkunMitra[AkunYangMasuk].TokoMitra[indeksToko].alamatToko.kota);
+					cout << "Masukkan Provinsi: ";	cin.ignore(); getline(cin, AkunMitra[AkunYangMasuk].TokoMitra[indeksToko].alamatToko.provinsi);
+					cout << "Masukkan Nomor Toko : ";	cin >> AkunMitra[AkunYangMasuk].TokoMitra[indeksToko].alamatToko.nomor;
+					cout << "Masukkan No Telepon : ";	cin >> AkunMitra[AkunYangMasuk].TokoMitra[indeksToko].noTelp;
+					cout << "Masukkan Luas Tanah (m2): ";	cin >> AkunMitra[AkunYangMasuk].TokoMitra[indeksToko].luasTanah;
+					cout << "Masukkan Luas Ruangan (m2): ";	cin >> AkunMitra[AkunYangMasuk].TokoMitra[indeksToko].luasRuangan;
+					cout << "Masukkan Harga Sewa (per tahun): Rp.";	cin >> AkunMitra[AkunYangMasuk].TokoMitra[indeksToko].hargaSewa;
+					cout << "Masukkan Jumlah Lantai: ";	cin >> AkunMitra[AkunYangMasuk].TokoMitra[indeksToko].jumlahLantai;
+					indeksToko++;
+					AkunMitra[AkunYangMasuk].indeksTokoMitra++;
+					cout << "Toko berhasil ditambahkan!\n";
+					system("pause");
+					break;
+				}
+				case 2: {
+					system("cls");
+					Banner();
+					CetakMid("DAFTAR TOKO " + AkunMitra[AkunYangMasuk].data.nama, true, 70);
+					for(int i = 0; i < 72; i++) cout << "="; cout << endl;
+					for (int i = 0; i < AkunMitra[AkunYangMasuk].indeksTokoMitra; i++) {
+						cout << i + 1 << ". " << AkunMitra[AkunYangMasuk].TokoMitra[i].namaToko << endl;
+						cout << "   Alamat: " << AkunMitra[AkunYangMasuk].TokoMitra[i].alamatToko.jalan << ", "
+						     << AkunMitra[AkunYangMasuk].TokoMitra[i].alamatToko.kabupaten << ", "
+						     << AkunMitra[AkunYangMasuk].TokoMitra[i].alamatToko.kota << ", "
+						     << AkunMitra[AkunYangMasuk].TokoMitra[i].alamatToko.provinsi << endl;
+						cout << "   No Telepon: " << AkunMitra[AkunYangMasuk].TokoMitra[i].noTelp << endl;
+						cout << "   Luas Tanah: " << AkunMitra[AkunYangMasuk].TokoMitra[i].luasTanah << " m2" << endl;
+						cout << "   Luas Ruangan: " << AkunMitra[AkunYangMasuk].TokoMitra[i].luasRuangan << " m2" << endl;
+						cout << "   Harga Sewa: Rp." << AkunMitra[AkunYangMasuk].TokoMitra[i].hargaSewa << endl;
+						cout << "   Jumlah Lantai: " << AkunMitra[AkunYangMasuk].TokoMitra[i].jumlahLantai << endl;
+						for(int i = 0; i < 72; i++) cout << "="; cout << endl;
+					}
+					cout << "Apakah anda ingin mengedit informasi toko? (y/n): ";
+					char jawab;
+					cin >> jawab;
+					if(jawab == 'y' || jawab == 'Y') {
+						cout << "pilih nomor toko yang ingin diedit (0 untuk batal): ";
+						int nomorToko;
+						cin >> nomorToko;
+						if(nomorToko > 0 && nomorToko <= AkunMitra[AkunYangMasuk].indeksTokoMitra) {
+							int indeks = nomorToko - 1;
+							cout << "Masukkan Nama Toko Baru: "; cin.ignore(); getline(cin, AkunMitra[AkunYangMasuk].TokoMitra[indeks].namaToko);
+							cout << "Masukkan Alamat Baru: "; cin.ignore(); getline(cin, AkunMitra[AkunYangMasuk].TokoMitra[indeks].alamatToko.jalan);
+							cout << "Masukkan Kabupaten Baru: "; cin.ignore(); getline(cin, AkunMitra[AkunYangMasuk].TokoMitra[indeks].alamatToko.kabupaten);
+							cout << "Masukkan Kota Baru: "; cin.ignore(); getline(cin, AkunMitra[AkunYangMasuk].TokoMitra[indeks].alamatToko.kota);
+							cout << "Masukkan Provinsi Baru: "; cin.ignore(); getline(cin, AkunMitra[AkunYangMasuk].TokoMitra[indeks].alamatToko.provinsi);
+							cout << "Masukkan Nomor Toko Baru: "; cin >> AkunMitra[AkunYangMasuk].TokoMitra[indeks].alamatToko.nomor;
+							cout << "Masukkan No Telepon Baru: "; cin >> AkunMitra[AkunYangMasuk].TokoMitra[indeks].noTelp;
+							cout << "Masukkan Luas Tanah Baru (m2): "; cin >> AkunMitra[AkunYangMasuk].TokoMitra[indeks].luasTanah;
+							cout << "Masukkan Luas Ruangan Baru (m2): "; cin >> AkunMitra[AkunYangMasuk].TokoMitra[indeks].luasRuangan;
+							cout << "Masukkan Harga Sewa Baru (per tahun): Rp."; cin >> AkunMitra[AkunYangMasuk].TokoMitra[indeks].hargaSewa;
+							cout << "Masukkan Jumlah Lantai Baru: "; cin >> AkunMitra[AkunYangMasuk].TokoMitra[indeks].jumlahLantai;
+							cout << "Informasi toko berhasil diubah!\n";
+						} else {
+							cout << "Batal mengedit informasi toko.\n";
+						}
+					}
+					system("pause");
+					break;
+				}
+				case 3: {
+					system("cls");
+					Banner();
+					CetakMid("SALDO " + AkunMitra[AkunYangMasuk].data.nama, true, 70);
+					for(int i = 0; i < 72; i++) cout << "="; cout << endl;
+					cout << "Saldo Anda: Rp." << AkunMitra[AkunYangMasuk].data.saldo << endl;
+					system("pause");
+					break;
+				}
+				case 4: {
+					system("cls");
+					Banner();
+					CetakMid("PROFILE " + AkunMitra[AkunYangMasuk].data.nama, true, 70);
+					for(int i = 0; i < 72; i++) cout << "="; cout << endl;
+					cout << "1. Nama: " << AkunMitra[AkunYangMasuk].data.nama << endl;
+					cout << "2. Username: " << AkunMitra[AkunYangMasuk].data.username << endl;
+					cout << "3. Password: " << AkunMitra[AkunYangMasuk].data.password << endl;
+					int pilihan;
+					cout << "Ketik 1-3 untuk mengubah data, ketik 0 untuk kembali... "; cin >> pilihan;
+					cin.ignore();
+					switch(pilihan) {
+						case 1:
+							cout << "Masukkan Nama Baru: ";
+							getline(cin, AkunMitra[AkunYangMasuk].data.nama);
+							break;
+						case 2:
+							cout << "Masukkan Username Baru: ";
+							getline(cin, AkunMitra[AkunYangMasuk].data.username);
+							break;
+						case 3:
+							cout << "Masukkan Password Baru: ";
+							getline(cin, AkunMitra[AkunYangMasuk].data.password);
+							break;
+						case 0:
+							break;
+						default:
+							cout << "Pilihan tidak valid!" << endl;
+					}
+					cout << "Data berhasil diubah!\n";
+					system("pause");
+					break;
+				}
+				case 5: {
+					MenuSign(1); // kembali ke menu sign
+					break;
+				}
+			}
+		}
+	} while(true);
+}
+
 void SignIn(int jenis){//1 member, 2 seller, 3 mitra
 	cin.ignore();
 	string username, password;
@@ -218,9 +491,9 @@ void SignIn(int jenis){//1 member, 2 seller, 3 mitra
 				for (int i = 0; i < jumlahMember; i++) {
 			        if (AkunMember[i].data.username == username) {
 			            usernameDitemukan = true;
-                        AkunYangMasuk = i; // Simpan indeks akun yang masuk
 			            if (AkunMember[i].data.password == password) {
 			                loginBerhasil = true;
+							AkunYangMasuk = i; // Simpan indeks akun yang masuk
 			                break;  
 			            } break; 
 			        }
@@ -256,11 +529,12 @@ void SignIn(int jenis){//1 member, 2 seller, 3 mitra
 			    getline(cin, username);
 			    cout << "Masukkan Password: ";
 			    getline(cin, password);
-				for (int i = 0; i < jumlahMember; i++) {
+				for (int i = 0; i < jumlahSeller; i++) {
 			        if (AkunSeller[i].data.username == username) {
 			            usernameDitemukan = true;
 			            if (AkunSeller[i].data.password == password) {
 			                loginBerhasil = true;
+							AkunYangMasuk = i; // Simpan indeks akun yang masuk
 			                break;  
 			            } break; 
 			        }
@@ -296,11 +570,12 @@ void SignIn(int jenis){//1 member, 2 seller, 3 mitra
 			    getline(cin, username);
 			    cout << "Masukkan Password: ";
 			    getline(cin, password);
-				for (int i = 0; i < jumlahMember; i++) {
+				for (int i = 0; i < jumlahMitra; i++) {
 			        if (AkunMitra[i].data.username == username) {
 			            usernameDitemukan = true;
 			            if (AkunMitra[i].data.password == password) {
 			                loginBerhasil = true;
+							AkunYangMasuk = i; // Simpan indeks akun yang masuk
 			                break;  
 			            } break; 
 			        }
@@ -308,7 +583,7 @@ void SignIn(int jenis){//1 member, 2 seller, 3 mitra
 			    if (loginBerhasil) {
 			        cout << "\033[34mLogin sebagai mitra berhasil!\033[0m\n";
 			        system("pause");
-					return; //ganti pake fungsi memanggil menu mitra nanti
+					MenuMitra();
 			    } else if (usernameDitemukan) {
 			        cout << "\033[31mPassword salah!\033[0m\n";
 			    } else {
@@ -432,9 +707,8 @@ void SignUp(int jenis) {//1 member, 2 seller, 3 mitra
 			        }
 			    }
 			} while (!valid);
-	        cout << "Masukkan Password: ";
-	        getline(cin, password);
-	        
+	        cout << "Masukkan Password: "; getline(cin, password);
+
 			AkunMitra[jumlahMitra].data.nama = nama;
 	        AkunMitra[jumlahMitra].data.username = username;
 	        AkunMitra[jumlahMitra].data.password = password;
