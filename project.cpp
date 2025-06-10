@@ -515,7 +515,7 @@ void MenuSeller(int idxAkunLogin){
 						Banner();
             			CetakMid("PROFIL TOKO", true, 70);
             			for(int i = 0; i < 72; i++) cout << "="; cout << endl;
-            			if (toko.namaToko == "") {
+            			if (AkunSeller[idxAkunLogin].jumlahToko == 0) {
                             cout << "\nAnda belum memiliki toko. Silakan isi data toko terlebih dahulu.\n";
 
                             cout << "Nama Toko       : ";
@@ -530,6 +530,7 @@ void MenuSeller(int idxAkunLogin){
                             toko.jumlahBarang = 0;
                             toko.kapasitasBarang = 10;
                             toko.daftarBarang = new Barang[toko.kapasitasBarang];
+                            AkunSeller[idxAkunLogin].jumlahToko += 1;
 
                             cout << "\nToko berhasil dibuat!\n";
                         } else {
@@ -561,7 +562,7 @@ void MenuSeller(int idxAkunLogin){
             			CetakMid("KELOLA BARANG", true, 70);
             			for(int i = 0; i < 72; i++) cout << "="; cout << endl;
             			if(AkunSeller[idxAkunLogin].jumlahToko == 0){//udah punya toko?
-							cout << "\nAnda belum menyewa tempat....\n";//sewa dulu sono
+							cout << "\nAnda belum memiliki toko, silahkan mengisi data toko terlebih dahulu\n";//sewa dulu sono
             				system("pause");
 						}else{
 							pilih = 1;
@@ -846,8 +847,18 @@ void MenuSeller(int idxAkunLogin){
 						CetakMid("SALDO " + AkunMitra[AkunYangMasuk].data.nama, true, 70);
 						for(int i = 0; i < 72; i++) cout << "="; cout << endl;
 						cout << "Saldo Anda: Rp." << AkunSeller[idxAkunLogin].data.saldo << endl;
-						system("pause");
-						break;
+						cout << "Ingin menambah saldo? (y): ";
+                        char jawab;
+                        cin >> jawab;
+                        if (jawab == 'y' || jawab == 'Y') {
+                            int nominal;
+                            cout << "Masukkan nominal yang ingin ditambahkan: ";
+                            cin >> nominal;
+                            AkunSeller[AkunYangMasuk].data.saldo += nominal;
+                            cout << "Saldo berhasil ditambahkan!" << endl;
+                            system("pause");
+                        } 
+                        break;
 					}
 					case 7:{//Kotak Pesan
 						Banner();
