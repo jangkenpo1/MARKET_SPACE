@@ -4,7 +4,6 @@
 using namespace std;
 
 int pilih = 1, input, AkunYangMasuk = 0;
-int totalTokoDisewa = 0;
 
 //Data  untuk semua akun
 	struct DataDiri {
@@ -25,7 +24,6 @@ int totalTokoDisewa = 0;
 		Alamat alamatToko;
 	};
 
-
 struct barangSeller {
     string namaBarang;
     int harga ;
@@ -33,6 +31,7 @@ struct barangSeller {
     string kategori;
     string deskripsi;
     string tokoAsal;
+    int indeksAkunSeller;//indeks yang punya barang
 }BarangSeller[100];
 int jumlahBarang = 0;
 
@@ -64,7 +63,7 @@ int jumlahBarangMember = 0;
 struct Member {
     DataDiri data;
     string HP, email;
-    member BarangMember[100];
+    member BarangMember[100];//barang yang dibeli
     int jumlahBarangMember;
 	int indeksBarangMember = 0;
 }AkunMember[100];
@@ -92,6 +91,7 @@ int jumlahMember = 1;
 			InfoToko toko;
 			int harga;
 			int idPemilik;
+			int indeksToko;//indkes untuk di edit mitra
 		}sewaToko[200];
 		int jumlahSewaToko = 1;
 		
@@ -101,7 +101,9 @@ int jumlahMember = 1;
 	    Toko toko;
 		string pesan[500];
 		int jumlahPesan = 0;
-	    int jumlahToko = 0;//bisa nyewa lebih dari 1 toko
+		member RiwayatMember[100];//list riwayat pembelian  
+	    int totalRiwayat = 0;
+		int jumlahToko = 0;//bisa nyewa lebih dari 1 toko
 	}AkunSeller[100];
 	int jumlahSeller = 1;
 
@@ -118,7 +120,7 @@ int jumlahMember = 1;
 		int jumlahPesan = 0;
 		DataDiri data;
 		InfoToko TokoMitra[100];
-		int jumlahTokoMitra = 0;
+		int jumlahTokoMitra = 0;//jumlah toko yang dimiliki mitra
 		int indeksToko[100];//simpan indkesnya untuk edit toko yang di ambil di struct sewaToko
 	} AkunMitra[100];
 	int jumlahMitra = 1;
@@ -263,6 +265,8 @@ void MenuMember(int idxAkunLogin){
 																int totalHarga = BarangSeller[pilih - 1].harga * beli;
 																AkunMember[idxAkunLogin].data.saldo -= totalHarga;
 																cout << "Pembelian anda berhasil di proses\n";
+																
+																//Simpan di riwayat Member
 																int& indeksBarang = AkunMember[idxAkunLogin].jumlahBarangMember;
 																AkunMember[idxAkunLogin].BarangMember[indeksBarang].namaBarang = BarangSeller[pilih - 1].namaBarang;
 																AkunMember[idxAkunLogin].BarangMember[indeksBarang].harga = BarangSeller[pilih - 1].harga;
@@ -270,6 +274,15 @@ void MenuMember(int idxAkunLogin){
 																AkunMember[idxAkunLogin].BarangMember[indeksBarang].namaTokoAsal = BarangSeller[pilih - 1].tokoAsal;
 																AkunMember[idxAkunLogin].BarangMember[indeksBarang].namaBarang = BarangSeller[pilih - 1].namaBarang;
 																indeksBarang++;
+																
+																//Simpan di riwayat Seller
+																int indeksAkunSeller = BarangSeller[pilih - 1].indeksAkunSeller;
+																int& indeksRiwayat = AkunSeller[indeksAkunSeller].totalRiwayat;
+																AkunSeller[indeksAkunSeller].RiwayatMember[indeksRiwayat].namaBarang = BarangSeller[pilih - 1].namaBarang;
+																AkunSeller[indeksAkunSeller].RiwayatMember[indeksRiwayat].jumlah = beli;
+																AkunSeller[indeksAkunSeller].RiwayatMember[indeksRiwayat].harga = BarangSeller[pilih - 1].harga * beli;
+																AkunSeller[indeksAkunSeller].RiwayatMember[indeksRiwayat].namaTokoAsal = AkunSeller[idxAkunLogin].data.username;
+																indeksRiwayat++;
 																system("pause");
 																break;
 															}
@@ -650,6 +663,7 @@ void MenuSeller(int idxAkunLogin){
 											    BarangSeller[jumlahBarang].harga = baru.harga;
 											    BarangSeller[jumlahBarang].stok = baru.stok;
 											    BarangSeller[jumlahBarang].tokoAsal = AkunSeller[idxAkunLogin].toko.namaToko;
+											    BarangSeller[jumlahBarang].indeksAkunSeller = idxAkunLogin;
 											    jumlahBarang++;
 											    
 											    toko.daftarBarang[toko.jumlahBarang++] = baru;
@@ -735,6 +749,25 @@ void MenuSeller(int idxAkunLogin){
 						break;
 					}
 					case 4:{//Riwayat Penjualan
+						system ("cls"); Banner();
+					    CetakMid("RIWAYAT PENJUALAN", true, 70);
+					    for(int i = 0; i < 72; i++) cout << "="; cout << endl;
+            			string tokoSaya = AkunSeller[idxAkunLogin].toko.namaToko;
+					    bool ada = false;
+					    for (int i = 0; i < jumlahMember; i++) {
+					        for (int j = 0; j < AkunSeller[idxAkunLogin].totalRiwayat; j++) {
+					            if (AkunMember[i].BarangMember[j].namaTokoAsal == tokoSaya) {
+					                ada = true;
+					                cout << "Pembeli: " << AkunSeller[idxAkunLogin].RiwayatMember[j].namaTokoAsal
+					                     << " | Barang: " << AkunSeller[idxAkunLogin].RiwayatMember[j].namaBarang
+					                     << " | Jumlah: " << AkunSeller[idxAkunLogin].RiwayatMember[j].jumlah
+					                     << " | Total: Rp." << AkunSeller[idxAkunLogin].RiwayatMember[j].harga
+					                     << endl;
+					            }
+					        }
+					    }
+					    if (!ada) cout << "Belum ada barang Anda yang dibeli.\n";
+					    system("pause");
 						break;
 					}
 					case 5:{//Kelola Promo
@@ -965,7 +998,7 @@ void MenuMitra(){
 						sewaToko[jumlahSewaToko].toko.luasRuangan = AkunMitra[AkunYangMasuk].TokoMitra[indeksToko].luasRuangan;
 						sewaToko[jumlahSewaToko].toko.hargaSewa = AkunMitra[AkunYangMasuk].TokoMitra[indeksToko].hargaSewa;
 						sewaToko[jumlahSewaToko].toko.jumlahLantai = AkunMitra[AkunYangMasuk].TokoMitra[indeksToko].jumlahLantai;
-						
+						sewaToko[jumlahSewaToko].indeksToko = jumlahSewaToko;//indeks di semua toko, guna untuk di ambil mitra yang punya toko
 						AkunMitra[AkunYangMasuk].indeksToko[AkunMitra[AkunYangMasuk].jumlahTokoMitra]++;
 						AkunMitra[AkunYangMasuk].jumlahTokoMitra++;
 						jumlahSewaToko++;
@@ -1005,6 +1038,7 @@ void MenuMitra(){
 						cin >> jawab;
 						if(jawab == 'y' || jawab == 'Y') {
 							int nomorToko;
+							
 							cout << "Pilih nomor toko yang ingin anda edit: ";
 							cin >> nomorToko;
 							if(nomorToko > 0 && nomorToko <= AkunMitra[AkunYangMasuk].jumlahTokoMitra) {
