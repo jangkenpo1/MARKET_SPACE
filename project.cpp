@@ -230,11 +230,17 @@ void MenuMember(int idxAkunLogin){
 									
 									input = getch();
 									switch (input) {
-										case 72: pilih = (pilih == 1) ? jumlahBarang + 1: pilih - 3; break; // Up
-										case 80: pilih = (pilih == jumlahBarang + 1) ? 1 : pilih + 3; break; // Down
-										
-										case 77: pilih = (pilih == 1) ? pilih + 1: 1; break; // Kanan
-										case 75: pilih = (pilih == 1) ? jumlahBarang : pilih - 1; break; // Kiri
+										case 72:{//up
+											if(pilih <= 3) pilih = jumlahBarang + 1;
+											else pilih -= 3;
+										}break;
+										case 80: {//down
+											if(pilih == jumlahBarang + 1) pilih = 1;
+											else if(pilih >= jumlahBarang - 3) pilih = jumlahBarang + 1;
+											else pilih += 3;
+										}break;
+										case 77: pilih = (pilih == jumlahBarang + 1) ? 1: pilih + 1; break; // Kanan
+										case 75: pilih = (pilih == 1) ? jumlahBarang + 1: pilih - 1; break; // Kiri
 										case 13:{
 											if(pilih == jumlahBarang + 1) jalan = false;
 											else{
@@ -523,10 +529,8 @@ void MenuSeller(int idxAkunLogin){
 
                             cout << "Nama Toko       : ";
                             getline(cin >> ws, toko.namaToko);
-
                             cout << "Deskripsi Toko  : ";
                             getline(cin, toko.deskripsiToko);
-                            
                             cout << "Kategori Toko   : ";
                             getline(cin, toko.kategoriToko);
 
@@ -900,7 +904,7 @@ void MenuMitra(){
 		CetakMid("Halo " + AkunMitra[AkunYangMasuk].data.nama, true, 70);
 	    for(int i = 0; i < 72; i++) cout << "="; cout << endl;
 		CetakMid("~~~~~~~~~~~~~~~~~~~~~~", true);
-		CetakMid("Tambah Toko", true, 70, 1);
+		CetakMid("Tambah Ruko", true, 70, 1);
 		CetakMid("~~~~~~~~~~~~~~~~~~~~~~", true);
 		CetakMid("~~~~~~~~~~~~~~~~~~~~~~", true);
 	    CetakMid("Edit Toko", true, 70, 2);
@@ -929,7 +933,7 @@ void MenuMitra(){
 						int indeksToko = AkunMitra[AkunYangMasuk].jumlahTokoMitra;
 						CetakMid("TAMBAH RUKO " + AkunMitra[AkunYangMasuk].data.nama, true, 70);
 						for(int i = 0; i < 72; i++) cout << "="; cout << endl;
-						cout << "Masukkan Nama Toko: ";
+						cout << "Masukkan Nama Ruko: ";
 						if(cin.peek() == '\n') cin.ignore();	 getline(cin, AkunMitra[AkunYangMasuk].TokoMitra[indeksToko].namaToko);
 						cout << "Masukkan jalan : ";	getline(cin, AkunMitra[AkunYangMasuk].TokoMitra[indeksToko].alamatToko.jalan);
 						cout << "  Masukkan desa: "; getline(cin, AkunMitra[AkunYangMasuk].TokoMitra[indeksToko].alamatToko.desa);
@@ -937,7 +941,7 @@ void MenuMitra(){
 						cout << "  Masukkan Kabupaten: ";	getline(cin, AkunMitra[AkunYangMasuk].TokoMitra[indeksToko].alamatToko.kabupaten);
 						cout << "  Masukkan Kota : ";	getline(cin, AkunMitra[AkunYangMasuk].TokoMitra[indeksToko].alamatToko.kota);
 						cout << "  Masukkan Provinsi: ";	getline(cin, AkunMitra[AkunYangMasuk].TokoMitra[indeksToko].alamatToko.provinsi);
-						cout << "Masukkan Nomor Toko : ";	cin >> AkunMitra[AkunYangMasuk].TokoMitra[indeksToko].alamatToko.nomor;
+						cout << "Masukkan Nomor Ruko : ";	cin >> AkunMitra[AkunYangMasuk].TokoMitra[indeksToko].alamatToko.nomor;
 						cout << "Masukkan No Telepon : ";	cin >> AkunMitra[AkunYangMasuk].TokoMitra[indeksToko].noTelp;
 						cout << "Masukkan Luas Tanah (m2): ";	cin >> AkunMitra[AkunYangMasuk].TokoMitra[indeksToko].luasTanah;
 						cout << "Masukkan Luas Ruangan (m2): ";	cin >> AkunMitra[AkunYangMasuk].TokoMitra[indeksToko].luasRuangan;
